@@ -1,0 +1,94 @@
+using BAL;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DAL.DBContext;
+
+namespace DAL
+{
+    public class Class2
+    {
+        public static List<studentst> getStudentDetails()
+        {
+            List<studentst> ls = new List<studentst>();
+            using (var context = new DBContext.testEntities1())
+            {
+                var data = context.students.Where(x => x.name == "Jaspreet" || x.name == "Kuljeet").ToList();
+                ls = data.Select(x => new studentst
+                {
+                    name = x.name,
+                    gender = x.gender,
+                    salary = x.salary,
+                    branch = x.branch
+                }).ToList();
+            }
+            return ls;
+        }
+        public static string postDataToDB(studentst st) {
+            using (var context = new DBContext.testEntities1())
+            {
+                student stu = new student();
+                stu.name = st.name;
+                stu.gender = st.gender;
+                stu.branch = st.branch;
+                stu.salary = st.salary;
+                context.Entry(stu).State = System.Data.Entity.EntityState.Added;
+                context.SaveChanges();
+            }
+            return "success";
+        }
+        public static string searchData(string sName) {
+            var gender="";
+            using (var context = new testEntities1()) {
+                var data = context.students.Where(x => x.name == sName).FirstOrDefault();
+                gender = data.gender;
+            }
+                return gender;
+        }
+        public static string DelData(string name)
+        {
+            using (var context = new testEntities1())
+            {
+                var data = context.students.Where(x => x.name == name).FirstOrDefault();
+                context.Entry(data).State = System.Data.Entity.EntityState.Deleted;
+                context.SaveChanges();
+            }
+            return "Entry Deleted";
+        }
+        public static string updateDetails(studentst got)
+        {
+            student s = new student();
+            using (var context =new testEntities1())
+            {
+                var data = context.students.Where(x => x.name == got.name).FirstOrDefault();
+                data.name = got.name;
+                data.gender = got.gender;
+                data.salary = got.salary;
+                data.branch = got.branch;
+
+                context.Entry(data).State = System.Data.Entity.EntityState.Modified;
+                context.SaveChanges();
+            }
+
+            return "Details updated";
+        }
+        public static List<studentst> getDetailsR(int r)
+        {
+            List<studentst> rr = new List<studentst>();
+            using (var context = new testEntities1())
+            {
+                var data = context.getTop(r).ToList();
+                rr = data.Select(x => new studentst
+                {
+                    name = x.name,
+                    gender = x.gender,
+                    salary = x.salary,
+                    branch = x.branch
+                }).ToList();
+            }
+                return rr;
+        }
+    }
+}
